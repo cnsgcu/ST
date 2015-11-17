@@ -40,7 +40,7 @@ class WebXML : WebApplicationInitializer
         return rootContext
     }
 
-    private fun createWebMvcContext(servletContext: ServletContext?, rootContext: WebApplicationContext )
+    private fun createWebMvcContext(servletContext: ServletContext?, rootContext: WebApplicationContext)
     {
         val webMvcContext = AnnotationConfigWebApplicationContext()
         webMvcContext.register(WebMvcConfig::class.java)

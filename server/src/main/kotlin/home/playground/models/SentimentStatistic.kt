@@ -8,36 +8,36 @@ import java.util.*
  */
 
 data class SentimentStatistic(
-    var total: Long = 0L,
+    var total    : Int = 0,
     var sentiment: String = "",
-    var freq: HashMap<String, HashMap<String, Long>> = hashMapOf(
-        "child" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+    var freq     : Map<String, Map<String, Int>> = mapOf(
+        "child" to mapOf(
+            "male"   to 0,
+            "female" to 0
         ),
         "adult18to24" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         ),
         "adult25to34" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         ),
         "adult35to44" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         ),
         "adult45to54" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         ),
         "adult55to64" to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         ),
         "adultOver64"  to hashMapOf(
-            "male"   to 0L,
-            "female" to 0L
+            "male"   to 0,
+            "female" to 0
         )
     )
 ) : Serializable

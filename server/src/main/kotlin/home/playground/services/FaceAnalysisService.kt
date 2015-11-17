@@ -3,7 +3,6 @@ package home.playground.services
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import home.playground.models.FaceRecognization
-import home.playground.models.Tweet
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -17,49 +16,6 @@ class FaceAnalysisService
 {
     private val apiKey: String = "49b985496341422f8251257fa06873ab"
     private val apiSecret: String = "Q64esshZDgV-o9h42WHStXgY8FF-N3z7"
-
-    fun faceAnalysis(tweet: Tweet): Boolean
-    {
-        val encodeUrl: String = URLEncoder.encode(tweet.profileImageUrl.replace("normal", "400x400"), "ISO-8859-1")
-
-        val jsonBuff = StringBuffer()
-        for (retry in 1..10) {
-            val url = URL("http://apius.faceplusplus.com/v2/detection/detect?api_key=$apiKey&api_secret=$apiSecret&url=$encodeUrl&attribute=age%2Cgender%2Crace")
-            val conn = url.openConnection()
-
-            try {
-                val rd = BufferedReader(InputStreamReader(conn.inputStream));
-
-                var line: String? = rd.readLine()
-                do {
-                    jsonBuff.append(line)
-                    line = rd.readLine()
-                } while(line != null)
-
-                break
-            } catch(e: IOException) {
-                println("${retry + 1} connection failed!")
-
-                if (retry == 10) {
-                    return false
-                } else {
-                    Thread.sleep(3000)
-                }
-            }
-        }
-
-        val gson = Gson()
-        val jsonObj = gson.fromJson(jsonBuff.toString(), JsonElement::class.java).asJsonObject
-
-        if (jsonObj.getAsJsonArray("face").size() != 0) {
-            val face = jsonObj.getAsJsonArray("face").first()
-
-            tweet.age = face.asJsonObject.get("attribute").asJsonObject.get("age").asJsonObject.get("value").asInt
-            tweet.gender = face.asJsonObject.get("attribute").asJsonObject.get("gender").asJsonObject.get("value").asString
-        }
-
-        return true
-    }
 
     fun faceAnalysis(imgUrl: String): FaceRecognization
     {

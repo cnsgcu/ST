@@ -2,11 +2,11 @@ package home.playground.configs
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import home.playground.Startup
 import home.playground.models.Tweet
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
+import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.Duration
@@ -21,7 +21,7 @@ import java.sql.Timestamp
 /**
  * Created by cuong on 11/15/15.
  */
-object Config
+object Global
 {
     private var twitterAuth: Authorization? = null
 
@@ -29,41 +29,66 @@ object Config
     private var javaSparkContext: JavaSparkContext? = null
     private var streamingContext: JavaStreamingContext? = null
 
+    private var tweetRdd: JavaRDD<Tweet>? = null
+
     val gson: Gson = GsonBuilder().create()
+
+    fun configureTweetRdd(): JavaRDD<Tweet>
+    {
+        if (tweetRdd == null) {
+            val sc = JavaSparkContext(createSparkConf())
+
+            val rdd = sc.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/piggy_bank/*")
+
+            tweetRdd = rdd.map { gson.fromJson(it, Tweet::class.java) }
+            tweetRdd!!.cache()
+        }
+
+        return tweetRdd as JavaRDD<Tweet>
+    }
 
     fun configureSqlContext(): SQLContext {
         if (sqlContext == null) {
-            configureJavaSparkContext()
+            configureSparkContext()
 
             sqlContext = SQLContext(streamingContext?.sparkContext());
 
             val tweetRDD = javaSparkContext!!.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/piggy_bank/*")
-                    .map { Config.gson.fromJson(it, Tweet::class.java) }
+                    .map { Global.gson.fromJson(it, Tweet::class.java) }
 
             val dfTweet = sqlContext!!.createDataFrame(tweetRDD, Tweet::class.java)
             dfTweet.registerTempTable("tweets")
+            sqlContext!!.cacheTable("tweets")
         }
 
         return sqlContext!!
     }
 
-    fun configureJavaSparkContext(): JavaSparkContext {
+    fun configureSparkContext(): JavaSparkContext {
         Logger.getLogger("org").level = Level.OFF
         Logger.getLogger("akka").level = Level.OFF
         Logger.getLogger("twitter4j").level = Level.OFF
 
         if (javaSparkContext == null) {
-            val conf = SparkConf().setMaster("local[5]")
-                    .setAppName("SparkSQL")
-                    .set("spark.driver.allowMultipleContexts", "true")
+            val conf = createSparkConf()
 
-            streamingContext = JavaStreamingContext(conf, Duration(3000))
-            //Thread{ collectTweet(streamingContext!!, configureTwitterAuth()) }.start()
+            streamingContext = JavaStreamingContext(conf, Duration(1000))
+            Thread{ collectTweet(streamingContext!!, configureTwitterAuth()) }.start()
 
             javaSparkContext = streamingContext!!.sparkContext()
         }
 
         return javaSparkContext!!
+    }
+
+    fun createSparkConf(): SparkConf {
+        val conf = SparkConf().setMaster("local[*]")
+                .setAppName("SparkSQL")
+                .set("spark.executor.memory", "1g")
+                .set("spark.default.parallelism", "8")
+                .set("spark.driver.allowMultipleContexts", "true")
+
+        return conf
     }
 
     fun configureTwitterAuth(): Authorization
