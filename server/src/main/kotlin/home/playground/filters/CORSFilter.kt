@@ -7,9 +7,11 @@ import java.io.IOException
 /**
  * Created by cuong on 11/15/15.
  */
-class CORSFilter : Filter {
+class CORSFilter : Filter
+{
     @Throws(IOException::class, ServletException::class)
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain)
+    {
         val httpResponse = response as HttpServletResponse
 
         httpResponse.setHeader("Access-Control-Allow-Origin", "*")

@@ -16,7 +16,7 @@ class SentimentAnalysis
     fun sentimentAnalysis(tweet: Tweet)
     {
         val apiKey = "243a800177544c32fa9c6dbcbdca4307d9dc9fe0"
-        val text = URLEncoder.encode("thanksgiving is a good way to get along with family", "ISO-8859-1")
+        val text = URLEncoder.encode(tweet.text, "ISO-8859-1")
 
         val sentimentApi = "http://access.alchemyapi.com/calls/text/TextGetTextSentiment?apikey=$apiKey&text=$text&outputMode=json"
 
