@@ -15,10 +15,15 @@ class SentimentAnalysis
 {
     fun sentimentAnalysis(tweet: Tweet)
     {
-        val apiKey = "243a800177544c32fa9c6dbcbdca4307d9dc9fe0"
-        val text = URLEncoder.encode(tweet.text, "ISO-8859-1")
+        tweet.sentiment = sentimentAnalysis(tweet.text)
+    }
 
-        val sentimentApi = "http://access.alchemyapi.com/calls/text/TextGetTextSentiment?apikey=$apiKey&text=$text&outputMode=json"
+    fun sentimentAnalysis(text: String): String
+    {
+        val apiKey = "2d1d83e324ca89a09731e06449b33073b2e5b48b"
+        val encodedText = URLEncoder.encode(text, "ISO-8859-1")
+
+        val sentimentApi = "http://access.alchemyapi.com/calls/text/TextGetTextSentiment?apikey=$apiKey&text=$encodedText&outputMode=json"
 
         val url = URL(sentimentApi)
 
@@ -36,7 +41,6 @@ class SentimentAnalysis
         val gson = Gson()
         val doc = gson.fromJson(jsonBuff.toString(), JsonElement::class.java).asJsonObject
 
-        // TODO sometime get null pointer here
-        tweet.sentiment = doc.get("docSentiment").asJsonObject.get("type").asString
+        return doc?.get("docSentiment")?.asJsonObject?.get("type")?.asString?.capitalize() ?: "Neutral"
     }
 }

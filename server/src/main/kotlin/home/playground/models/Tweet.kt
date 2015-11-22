@@ -32,7 +32,7 @@ data class Tweet (
     val hashTag        : String    = "",
     val createdDate    : Timestamp = Timestamp(Date().time),
     var gender         : String?   = null, // Enum: Male, Female, Unknown
-    var sentiment      : String    = "",   // Enum: Pos, Neg, Neu, Unknown
+    var sentiment      : String    = "Neutral",   // Enum: Pos, Neg, Neu, Unknown
     var age            : Int?      = null,
     val mediaType      : String    = ""
 ) : Serializable

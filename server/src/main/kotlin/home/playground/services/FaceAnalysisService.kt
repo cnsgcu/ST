@@ -3,6 +3,7 @@ package home.playground.services
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import home.playground.models.FaceRecognization
+import home.playground.models.Tweet
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -16,6 +17,15 @@ class FaceAnalysisService
 {
     private val apiKey: String = "49b985496341422f8251257fa06873ab"
     private val apiSecret: String = "Q64esshZDgV-o9h42WHStXgY8FF-N3z7"
+
+    fun faceAnalysis(tweet: Tweet)
+    {
+        println(tweet.profileImageUrl.replace("normal", "400x400"))
+        val fr = faceAnalysis(tweet.profileImageUrl.replace("normal", "400x400"))
+
+        tweet.age = fr.age
+        tweet.gender = fr.gender
+    }
 
     fun faceAnalysis(imgUrl: String): FaceRecognization
     {
@@ -38,7 +48,7 @@ class FaceAnalysisService
 
                 break
             } catch(e: IOException) {
-                println("${retry + 1} connection failed!")
+                println("$retry connection failed!")
 
                 if (retry == 10) {
                     return fr

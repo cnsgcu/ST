@@ -38,10 +38,11 @@ object Global
         if (tweetRdd == null) {
             val sc = JavaSparkContext(createSparkConf())
 
-            val rdd = sc.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/piggy_bank/*")
+            val rdd = sc.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/tweet_bank/*")
 
             tweetRdd = rdd.map { gson.fromJson(it, Tweet::class.java) }
             tweetRdd!!.cache()
+            tweetRdd!!.count()
         }
 
         return tweetRdd as JavaRDD<Tweet>
@@ -53,7 +54,7 @@ object Global
 
             sqlContext = SQLContext(streamingContext?.sparkContext());
 
-            val tweetRDD = javaSparkContext!!.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/piggy_bank/*")
+            val tweetRDD = javaSparkContext!!.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/tweet_bank/*")
                     .map { Global.gson.fromJson(it, Tweet::class.java) }
 
             val dfTweet = sqlContext!!.createDataFrame(tweetRDD, Tweet::class.java)
@@ -115,14 +116,14 @@ object Global
 
         tweetStream.foreachRDD { statusRDD, time ->
             val tweetRDD = statusRDD
-                    .filter { it.user.lang.equals("en") && it.hashtagEntities.isNotEmpty() }
+                    .filter { it.lang.equals("en") && it.hashtagEntities.isNotEmpty() }
                     .map {
                         val tweet = Tweet(text = it.text, profileImageUrl = it.user.profileImageURL, createdDate = Timestamp(it.createdAt.time), hashTag = it.hashtagEntities.first().text)
 //                      faceAnalysis(tweet)
                         gson.toJson(tweet)
                     }
 
-            tweetRDD.saveAsTextFile("/Users/cuong/Downloads/spark-1.5.1/examples/piggy_bank/${time.milliseconds()}")
+            tweetRDD.saveAsTextFile("/Users/cuong/Downloads/spark-1.5.1/examples/tweet_bank/${time.milliseconds()}")
 
             null
         }
