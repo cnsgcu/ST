@@ -20,6 +20,8 @@ public class ApplicationConfig
 
     private JavaRDD<TweetAnalytics> tweetRdd;
 
+    private final String sparkStorageDirectory = "/Users/cuong/Downloads/spark-1.5.1/examples/tweet_bank/*";
+
     @Bean
     public JavaRDD<TweetAnalytics> tweetRdd()
     {
@@ -28,7 +30,7 @@ public class ApplicationConfig
         if (tweetRdd == null) {
             final JavaSparkContext sc = new JavaSparkContext(createSparkConf());
 
-            final JavaRDD<String> rdd = sc.textFile("/Users/cuong/Downloads/spark-1.5.1/examples/tweet_bank/*");
+            final JavaRDD<String> rdd = sc.textFile(sparkStorageDirectory);
 
             tweetRdd = rdd.map(s -> new GsonBuilder().create().fromJson(s, TweetAnalytics.class));
             tweetRdd.cache();
